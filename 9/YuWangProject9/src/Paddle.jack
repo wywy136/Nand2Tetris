@@ -1,0 +1,73 @@
+class Paddle {
+    // Size
+    field int length, height;
+
+    // Coordinates
+    field int cur_x, old_x, cur_y;
+
+    constructor Paddle new(int l, int h, int x, int y){
+        let length = l;
+        let height = h;
+        let cur_x = x;
+        let old_x = x;
+        let cur_y = y;
+
+        do paintPaddle();
+
+        return this;
+    }
+
+    // Paint the paddle
+    method void paintPaddle(){
+        // First clear the old paddle by painting it white
+        do Screen.setColor(false);
+        do Screen.drawRectangle(old_x - 1, cur_y, old_x + length + 1, cur_y + height);
+
+        // Then paint the new paddle
+        do Screen.setColor(true);
+        do Screen.drawRectangle(cur_x, cur_y, cur_x + length, cur_y + height);
+
+        return;
+    }
+
+    // Move the paddle horizontally
+    method void move(int dir_x){
+
+        // Check if the paddle has reached the side of the screen
+        // If so, do nothing
+        if (cur_x = 2){
+            let cur_x = cur_x + 1;
+            return;
+        }
+        if (cur_x = 478){
+            let cur_x = cur_x - 1;
+            return;
+        }
+
+        // Update the old_x and cur_x
+        let old_x = cur_x;
+        let cur_x = old_x + dir_x;
+        do paintPaddle();
+
+        return;
+    }
+
+    method int get_left(){
+        return cur_x;
+    }
+
+    method int get_right(){
+        return cur_x + length;
+    }
+
+    method int get_down(){
+        return cur_y;
+    }
+
+    method void dispose(){
+        do Memory.deAlloc(this);
+
+        return;
+    }
+
+}

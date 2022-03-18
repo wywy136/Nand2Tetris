@@ -1,0 +1,114 @@
+class Game {
+    field Paddle paddle;
+
+    field Ball ball;
+
+    field bool movable;
+
+    field bool fail;
+
+    field char c;
+
+    field int score;
+
+    field bool start;
+
+    field String s;
+
+    constructor Game new(){
+        let paddle = Paddle.new(40, 4, 236, 220);
+        let ball = Ball.new(256, 215);
+        let c = 0;
+        let score = 0;
+
+        let movable = true;
+
+        let fail = false;
+
+        let start = false;
+
+        return this;
+    }
+
+    method void prepareGame(){
+        do Output.moveCursor(8, 8);
+        do Output.printString("Horizontally move the paddle by pressing <left/right>.");
+        do Output.moveCursor(10, 15);
+        do Output.printString("Quit the game by pressing <esc>.");
+        do Output.moveCursor(12, 22);
+        do Output.printString("<enter> to start.");
+
+        return;
+    }
+
+    method void playGame(){
+        while (~start){
+            if (Keyboard.keyPressed() = 128){
+                let start = true;
+            }
+        }
+
+        do Screen.setColor(false);
+        do Screen.drawRectangle(0, 0, 511, 255);
+
+        // var String s;
+        let s = "Score earned: ";
+
+        // The forever loop
+        while (~fail) {
+
+            // Check whether the game has failed
+            let fail = ball.changeDir(paddle);
+
+            // Detect and keyboard pressed
+            let c = Keyboard.keyPressed();
+
+            if (c = 140){
+                let fail = true;
+            }
+
+            if (c = 130){
+                // Move left
+                do paddle.move(-1);
+                let c = 0;
+            }
+            if (c = 132){
+                // Move right
+                do paddle.move(1);
+                let c = 0;
+            }
+
+            // Move the ball every 2 loops. This is because we should set the speed of the ball
+            // lower than the speed of the paddle, so that the paddle could always catch up the ball
+            if (movable){
+                do ball.move();
+            }
+            let movable = ~movable;
+
+            // Print the score
+            do Output.moveCursor(22, 0);
+            do Output.printString(s);
+            let score = ball.getScore();
+            do Output.printInt(score);
+
+            // Draw the splitting line
+            do Screen.drawLine(0, 235, 511, 235);
+
+            // Let the system wait 5 ms
+            do Sys.wait(5);
+        }
+
+        do Sys.halt();
+
+        return;
+    }
+
+    // De-allocates all the object
+    method void dispose(){
+        do paddle.dispose();
+        do ball.dispose();
+        do Memory.deAlloc(this);
+
+        return;
+    }
+}

@@ -1,0 +1,168 @@
+class Ball {
+    // Coordinates
+    field int cur_x, cur_y;
+    field int old_x, old_y;
+
+    // Directions
+    field int dx, dy;
+
+    // Left and right side of the paddle
+    field int paddle_left, paddle_right, paddle_down;
+
+    // Whether the ball locates outside the paddle
+    field bool status;
+
+    // The score gained
+    field int score;
+
+    // Whether the game has started, used for adding the score
+    field bool start;
+
+    constructor Ball new(int x, int y){
+        let cur_x = x;
+        let cur_y = y;
+        let old_x = x;
+        let old_y = y;
+
+        let dx = 1;
+        let dy = -1;
+
+        let paddle_left = 240;
+        let paddle_right = 272;
+
+        let status = false;
+
+        let score = 0;
+
+        let start = false;
+
+        do paintBall();
+
+        return this;
+    }
+
+    // Paint the ball
+    method void paintBall(){
+
+        // First clear the old ball by painting it white
+        do Screen.setColor(false);
+        do Screen.drawCircle(old_x, old_y, 4);
+
+        // Then paint the new ball
+        do Screen.setColor(true);
+        do Screen.drawCircle(cur_x, cur_y, 4);
+
+        return;
+    }
+
+    // Move the ball
+    method void move(){
+
+        // Update the coordinates of the ball
+        let old_x = cur_x;
+        let old_y = cur_y;
+        let cur_x = old_x + dx;
+        let cur_y = old_y + dy;
+
+        do paintBall();
+
+        return;
+    }
+
+    // Check whether the ball failed to be bounced
+    method bool fail(Paddle paddle){
+        // Get left, right side of the paddle
+        let paddle_left = paddle.get_left();
+        let paddle_right = paddle.get_right();
+
+        // If the ball's x is in (left, right), returns false
+        if ((cur_x < paddle_right) & (cur_x > paddle_left)){
+            return false;
+        }
+        else{
+            return true;
+        }
+    }
+
+    method int getScore(){
+        return score;
+    }
+
+    // Change direction of the ball
+    method bool changeDir(Paddle paddle){
+        // The ball hits the left size of the screen
+        if (cur_x = 10){
+            do Screen.setColor(false);
+            do Screen.drawCircle(old_x, old_y, 6);
+            let cur_x = old_x + 1;
+
+            // Should bounced right
+            let dx = -dx;
+            return false;
+        }
+
+        // The ball hits the right size of the screen
+        if (cur_x = 502) {
+            do Screen.setColor(false);
+            do Screen.drawCircle(old_x, old_y, 6);
+            let cur_x = old_x - 1;
+
+            // Should bounced left
+            let dx = -dx;
+            return false;
+        }
+
+        // The ball hits the up size of the screen
+        if (cur_y = 10){
+            do Screen.setColor(false);
+            do Screen.drawCircle(old_x, old_y, 6);
+            let cur_y = old_y + 1;
+
+            // Should bounced down
+            let dy = -dy;
+            let start = true;
+            return false;
+        }
+
+        // The ball moves to the same horizontal level as the paddle
+        if (cur_y = 215){
+
+            // Check whether it failed
+            let status = fail(paddle);
+
+            do Screen.setColor(false);
+            do Screen.drawCircle(old_x, old_y, 6);
+            // do Screen.setColor(true);
+            do paddle.paintPaddle();
+            let cur_y = old_y - 1;
+
+
+            // Should bounced up
+            let dy = -dy;
+
+            // If the ball succeed to be bounced
+            if ((status = false) & start){
+
+                // Add the score
+                let score = score + 1;
+            }
+
+            // Return the failure status
+            return status;
+        }
+
+        // if (cur_y > paddle_down - 1){
+        //    return true;
+        // }
+
+        else{
+            return false;
+        }
+    }
+
+    method void dispose(){
+        do Memory.deAlloc(this);
+
+        return;
+    }
+}
